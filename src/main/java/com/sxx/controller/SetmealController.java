@@ -117,4 +117,12 @@ public class SetmealController {
         setmealService.updateSetmealWithDish(setmealDto);
         return R.success("修改成功");
     }
+    @GetMapping("list")
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Setmeal::getCategoryId,setmeal.getCategoryId());
+        queryWrapper.eq(Setmeal::getStatus,1);
+        List<Setmeal> list = setmealService.list(queryWrapper);
+        return R.success(list);
+    }
 }

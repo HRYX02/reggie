@@ -2,9 +2,9 @@ package com.sxx.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sxx.common.R;
 import com.sxx.entity.Category;
 import com.sxx.service.CategoryService;
-import com.sxx.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +49,7 @@ public class CategoryController {
     @GetMapping("list")
     public R<List<Category>> list(Category category){
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Category::getType,category.getType());
+        queryWrapper.eq(category.getType() != null,Category::getType,category.getType());
         List<Category> list = categoryService.list(queryWrapper);
         return R.success(list);
     }

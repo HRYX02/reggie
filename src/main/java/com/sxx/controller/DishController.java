@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sxx.dto.DishDto;
 import com.sxx.entity.Category;
 import com.sxx.entity.Dish;
+import com.sxx.entity.DishFlavor;
 import com.sxx.service.CategoryService;
+import com.sxx.service.DishFlavorService;
 import com.sxx.service.DishService;
 import com.sxx.common.R;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class DishController {
     private DishService dishService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private DishFlavorService dishFlavorService;
 
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto){
@@ -103,11 +107,29 @@ public class DishController {
         return R.success("删除成功");
     }
 
-    @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
+    @Deprecated
+    @GetMapping("/list2")
+    public R<List<Dish>> list2(Dish dish){
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Dish::getCategoryId,dish.getCategoryId());
         List<Dish> list = dishService.list(queryWrapper);
         return R.success(list);
+    }
+    @GetMapping("/list")
+    public R<List<DishDto>> list(Dish dish){
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Dish::getCategoryId,dish.getCategoryId());
+        List<Dish> list = dishService.list(queryWrapper);
+        List<DishDto> dishDtoList = list.stream().map(item -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(dish, dishDto);
+            LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper();
+            lambdaQueryWrapper.eq(DishFlavor::getDishId, item.getId());
+            List<DishFlavor> dishFlavors = dishFlavorService.list(lambdaQueryWrapper);
+            //TODO 添加口味
+            dishDto.setFlavors(dishFlavors);
+            return dishDto;
+        }).collect(Collectors.toList());
+        return R.success(dishDtoList);
     }
 }

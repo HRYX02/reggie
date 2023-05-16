@@ -34,7 +34,7 @@ public class EmployeeController {
     };
 
     @PostMapping
-    public R<String> addEmployee(HttpServletRequest request, @RequestBody Employee employee){
+    public R<String> addEmployee(@RequestBody Employee employee){
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
         employeeService.save(employee);
         return R.success("添加成功");
