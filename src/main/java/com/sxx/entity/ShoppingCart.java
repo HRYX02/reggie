@@ -1,6 +1,7 @@
 package com.sxx.entity;
 
 import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,7 +19,6 @@ public class ShoppingCart implements Serializable {
     //名称
     private String name;
 
-    //用户id
     private Long userId;
 
     //菜品id

@@ -122,11 +122,10 @@ public class DishController {
         List<Dish> list = dishService.list(queryWrapper);
         List<DishDto> dishDtoList = list.stream().map(item -> {
             DishDto dishDto = new DishDto();
-            BeanUtils.copyProperties(dish, dishDto);
+            BeanUtils.copyProperties(item, dishDto);
             LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper();
             lambdaQueryWrapper.eq(DishFlavor::getDishId, item.getId());
             List<DishFlavor> dishFlavors = dishFlavorService.list(lambdaQueryWrapper);
-            //TODO 添加口味
             dishDto.setFlavors(dishFlavors);
             return dishDto;
         }).collect(Collectors.toList());

@@ -1,5 +1,7 @@
 package com.sxx.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sxx.common.BaseContext;
 import com.sxx.common.R;
 import com.sxx.entity.ShoppingCart;
 import com.sxx.service.ShoppingCartService;
@@ -19,15 +21,31 @@ public class ShoppingCartController {
 
     @GetMapping("/list")
     public R<List<ShoppingCart>> list(){
-        List<ShoppingCart> list = shoppingCartService.list();
+        LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());
+        queryWrapper.orderByAsc(ShoppingCart::getCreateTime);
+        List<ShoppingCart> list = shoppingCartService.list(queryWrapper);
         return R.success(list);
     }
 
     @PostMapping("/add")
     public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart){
-        log.info(shoppingCart.toString());
-
-        return null;
+        ShoppingCart cartServiceOne = shoppingCartService.checkAdd(shoppingCart);
+        return R.success(cartServiceOne);
     }
 
+    @PostMapping("/sub")
+    public R<ShoppingCart> sub(@RequestBody ShoppingCart shoppingCart) {
+
+        ShoppingCart cartServiceOne = shoppingCartService.reduce(shoppingCart);
+        return R.success(cartServiceOne);
+    }
+
+    @DeleteMapping("/clean")
+    public R<String> delete(){
+        LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());
+        shoppingCartService.remove(queryWrapper);
+        return R.success("清空购物车成功");
+    }
 }

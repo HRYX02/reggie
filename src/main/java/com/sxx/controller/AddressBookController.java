@@ -1,5 +1,6 @@
 package com.sxx.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.sxx.common.BaseContext;
 import com.sxx.common.R;
@@ -59,16 +60,33 @@ public class AddressBookController {
         return R.error("删除失败");
     }
     @PutMapping("/default")
-    private R<String> setDefault(@RequestBody AddressBook addressBook){
+    public R<String> setDefault(@RequestBody AddressBook addressBook){
         LambdaUpdateWrapper<AddressBook> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(AddressBook::getUserId,BaseContext.getCurrentId());
         updateWrapper.set(AddressBook::getIsDefault,0);
         addressBookService.update(updateWrapper);
-
         addressBook.setIsDefault(1);
         addressBookService.updateById(addressBook);
         return R.success("修改成功");
     }
 
+    /**
+     * TODO 如果return为null点击结算就跳到新增地址
+     */
+    @GetMapping("default")
+    public R<AddressBook> getDefault() {
+        LambdaQueryWrapper<AddressBook> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(AddressBook::getUserId, BaseContext.getCurrentId());
+        queryWrapper.eq(AddressBook::getIsDefault, 1);
+
+        //SQL:select * from address_book where user_id = ? and is_default = 1
+        AddressBook addressBook = addressBookService.getOne(queryWrapper);
+
+        if (null == addressBook) {
+            return R.error("没有找到该对象");
+        } else {
+            return R.success(addressBook);
+        }
+    }
     //TODO: 历史订单，最新订单
 }
